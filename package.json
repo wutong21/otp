@@ -1,5 +1,5 @@
 {
-  "name": "otp",
+  "name": "@wutong/otp",
   "version": "1.0.0",
   "files": [
     "dist",
