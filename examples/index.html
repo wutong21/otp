@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>TOTP.js On Browser</title>
+    <style>
+      .main {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        left: 50%;
+        top: 50%;
+        margin-left: -150px;
+        margin-top: -150px;
+        text-align: center;
+        line-height: 2;
+      }
+      .main .preview {
+        text-align: left;
+      }
+      .main .preview .label {
+        display: inline-block;
+        font-weight: bold;
+        width: 100px;
+      }
+      #qrcode {
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="qrcode">
+        Scan with QR code<br />
+        Or copy the secret key below
+        <div id="qrcode"></div>
+      </div>
+
+      <div class="preview">
+        <span class="label">Secret Key : </span>
+        <span id="secret"></span><br />
+
+        <span class="label">TOTP Code: </span>
+        <span id="totp"></span><br />
+
+        <span class="label">TOTP TTL : </span>
+        <span id="ttl"></span>
+      </div>
+    </div>
+
+    <script src="../examples/qrcode.js"></script>
+    <script src="../dist/totp.min.js"></script>
+    <script>
+      !(function main() {
+        // 确保 TOTP 已经加载
+        if (typeof OTP.TOTP === "undefined") {
+          console.error(
+            "TOTP is not defined. Please check the script loading."
+          );
+          return;
+        }
+
+        var $qrcode = document.getElementById("qrcode");
+        var $secret = document.getElementById("secret");
+        var $totp = document.getElementById("totp");
+        var $ttl = document.getElementById("ttl");
+
+        // 创建 TOTP 实例
+        var totp = new OTP.TOTP({
+          secret: "YOUR_SECRET", // 密钥
+          algorithm: "SHA256", // 算法
+          digits: 6, // 生成口令的位数
+          period: 30, // 口令更新周期（秒）
+        });
+
+        // 生成当前时间的 TOTP 口令
+        var token = totp.generate(); // 生成 TOTP 口令
+        $totp.innerHTML = token; // 显示 TOTP 口令
+
+        // 根据自定义时间戳、离散数组生成动态口令
+        var token1 = totp.generateByPosition({
+          timestamp: Date.now(),
+          position: [0, 7, 14, 19, 23, 31],
+        });
+
+        console.log(token);
+        console.log(token1);
+
+        // 显示密钥
+        $secret.innerHTML = totp.secret; // 显示密钥
+        var qrnode = new AraleQRCode({
+          size: 128,
+          text: totp.toURI(), // 生成 QR 码
+        });
+        $qrcode.appendChild(qrnode); // 添加 QR 码到页面
+
+        function refreshCode() {
+          $totp.innerHTML = totp.generate(); // 刷新 TOTP 代码
+        }
+
+        function startInterval() {
+          setInterval(function () {
+            var ttl = Math.floor((Date.now() / 1000) % 30);
+            $ttl.innerHTML = 30 - ttl; // 显示剩余时间
+            if (ttl === 0) {
+              refreshCode(); // 每 30 秒刷新一次代码
+            }
+          }, 1000);
+        }
+
+        /**
+         * 将时间同步到整秒, 再开始轮询
+         */
+        function sync2NextSecond() {
+          var ms2NextSecond = 1000 - (Date.now() % 1000);
+          setTimeout(startInterval, ms2NextSecond);
+        }
+
+        sync2NextSecond();
+        refreshCode();
+      })();
+    </script>
+  </body>
+</html>
