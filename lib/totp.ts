@@ -36,7 +36,7 @@ export class TOTP {
     period = 30,
     position = [],
     label = "OTPAuth",
-    issuer = "hikvision",
+    issuer = "default test",
   }: {
     secret: string;
     algorithm?: string;
