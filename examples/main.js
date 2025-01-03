@@ -1,4 +1,4 @@
-const { TOTP } = require("../dist/TOTP.min.js");
+const { TOTP } = require("./TOTP.min.js");
 
 // 创建 TOTP 实例
 const totp = new TOTP({
