@@ -69,7 +69,7 @@
 
         // 创建 TOTP 实例
         var totp = new OTP.TOTP({
-          secret: "YOUR_SECRET", // 密钥
+          secret: "GAXDGMRSGNTDQYT2", // 密钥
           algorithm: "SHA256", // 算法
           digits: 6, // 生成口令的位数
           period: 30, // 口令更新周期（秒）
@@ -79,20 +79,11 @@
         var token = totp.generate(); // 生成 TOTP 口令
         $totp.innerHTML = token; // 显示 TOTP 口令
 
-        // 根据自定义时间戳、离散数组生成动态口令
-        var token1 = totp.generateByPosition({
-          timestamp: Date.now(),
-          position: [0, 7, 14, 19, 23, 31],
-        });
-
-        console.log(token);
-        console.log(token1);
-
         // 显示密钥
         $secret.innerHTML = totp.secret; // 显示密钥
         var qrnode = new AraleQRCode({
           size: 128,
-          text: totp.toURI(), // 生成 QR 码
+          text: totp.toString(), // 生成 QR 码
         });
         $qrcode.appendChild(qrnode); // 添加 QR 码到页面
 

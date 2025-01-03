@@ -26,7 +26,6 @@ export class TOTP {
   private period: number;
 
   private issuer: string;
-  private issuerInLabel: boolean;
   private label: string;
   private position: Array<number>;
 
@@ -36,27 +35,24 @@ export class TOTP {
     digits = 6,
     period = 30,
     position = [],
-    issuer = "",
-    issuerInLabel = true,
     label = "OTPAuth",
+    issuer = "hikvision",
   }: {
     secret: string;
     algorithm?: string;
     digits?: number;
     period?: number;
     position?: Array<number>;
-    issuer?: string;
-    issuerInLabel?: boolean;
     label?: string;
+    issuer?: string;
   }) {
     this.secret = secret;
     this.algorithm = algorithm;
     this.digits = digits;
     this.period = period;
     this.position = position;
-    this.issuer = issuer;
-    this.issuerInLabel = issuerInLabel;
     this.label = label;
+    this.issuer = issuer;
   }
   /**
    * @method 生成动态口令
@@ -131,17 +127,11 @@ export class TOTP {
    * Returns a Google Authenticator key URI.
    * @returns {string} URI.
    */
-  toURI() {
+  toString() {
     const e = encodeURIComponent;
     return (
       "otpauth://totp/" +
-      `${
-        this.issuer.length > 0
-          ? this.issuerInLabel
-            ? `${e(this.issuer)}:${e(this.label)}?issuer=${e(this.issuer)}&`
-            : `${e(this.label)}?issuer=${e(this.issuer)}&`
-          : `${e(this.label)}?`
-      }` +
+      `${e(this.issuer)}:${e(this.label)}?issuer=${e(this.issuer)}&` +
       `secret=${e(this.secret)}&` +
       `algorithm=${e(this.algorithm)}&` +
       `digits=${e(this.digits)}&` +
